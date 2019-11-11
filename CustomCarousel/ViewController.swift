@@ -12,10 +12,23 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
    
     
     
+    func carouselGetCurrentIndex(scroll: UIScrollView, currentIndex: Int) {
+        print(currentIndex)
+    }
+    
+  
+    
+    func carouselDidEndScrollingAnimation(scroll: UIScrollView) {
+        
+    }
+    
+   
+    
+    
     func viewForIndexPathAtFullView(component: AmazingComponent, atView: UIView, index: Int) -> UIView {
         
-        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
-        label.center = CGPoint(x: 160, y: 285)
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 21))
+        label.center = CGPoint(x: 50, y: 50)
         label.textAlignment = .center
         label.backgroundColor = UIColor.orange
         label.text = "I'm a test label"
@@ -26,9 +39,9 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
     }
 
     
-    func requiredHeightandWidth(component: AmazingComponent) -> (Double,Double) {
+    func requiredHeightandWidth(component: AmazingComponent) -> (Double, Double, Double, Double) {
             
-        return (Double(self.view.frame.size.width),500)
+        return (Double( self.view.frame.size.width),500,0,200)
     }
     
     func numberofViewsRequired(component: AmazingComponent) -> Int {
@@ -41,12 +54,14 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
   var newView:AmazingComponent?
   override func viewDidLoad() {
       super.viewDidLoad()
+    
+    self.view.backgroundColor = UIColor.orange
       // Do any additional setup after loading the view.
       newView = AmazingComponent()
       newView?.frame=CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
       newView?.initWithView(view: self.view)
       newView?.isUserInteractionEnabled=true
-      newView?.carouselType=CarouselType.Coverflow.rawValue
+    newView?.carouselType=CarouselType.Cylinder.rawValue
       //newView?.requiredSpacing=500
       newView?.isVertical=false
       newView?.delegator=self
