@@ -20,6 +20,7 @@ protocol AmazingComponentDelgateProtocol:class {
     func scrolldidScroll(scroll:UIScrollView)
     func carouselGetCurrentIndex(scroll:UIScrollView,currentIndex:Int)
     func carouselDidEndScrollingAnimation(scroll:UIScrollView)
+    func carouselDidSelectItemAtIndex(scrollview:UIScrollView,Index:Int)
 }
 
 protocol AmazingComponentDataSourceProtocol:class {
@@ -41,7 +42,6 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
    private var requiredWidth:Double? = nil
     private var requiredX:Double? = nil
     private var requiredY:Double? = nil
-    fileprivate let kDistanceToProjectionPlane:CGFloat = 500.0
 
     public var isVertical:Bool? = true
     private var hostview:UIView?
@@ -73,8 +73,21 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
     var Angle:CGFloat?
     var inclinationAngle:CGFloat?
     var backItemAlpha:CGFloat?
+    var xPos : CGFloat = 0
+  fileprivate var kDistanceToProjectionPlane:CGFloat = 1/500.0
+    open var carouselDirectionRight:Bool = false {
+        
+        didSet {
+            if carouselDirectionRight == true {
+                kDistanceToProjectionPlane = -1/500.0
+            } else   {
+                kDistanceToProjectionPlane = 1/500.0
+            }
+        }
+        
+    }
 
-
+    
 
     open var maxCoverDegree:CGFloat = 45 {
         didSet {
@@ -156,7 +169,9 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
                   contentView.backgroundColor = UIColor.green
               }
         
-        if isVertical == true{
+        
+         
+         if isVertical == true{
             scrollView?.contentSize = CGSize(width:Double(self.requiredWidth!), height: Double(index) * Double(self.requiredHeight!))
             if requiredSpacing != nil {
                 contentView.frame = CGRect(x: Double(self.requiredX!), y: Double(index) * Double(requiredSpacing!), width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
@@ -164,15 +179,29 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
                 contentView.frame = CGRect(x: Double(self.requiredX!), y: Double(index) * Double(self.requiredHeight!), width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
             }
         }else{
-            scrollView?.contentSize = CGSize(width: Double(index) * Double(self.requiredWidth!), height:Double(self.requiredHeight!))
             if requiredSpacing != nil {
                 contentView.frame = CGRect(x: Double(index) * Double(requiredSpacing!), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
             }else{
-                contentView.frame = CGRect(x: Double(index) * Double(self.requiredWidth!), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
+                
+                if (index==0){
+                    contentView.frame = CGRect(x:Double(xPos +
+                       80), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
+              }else{
+                contentView.frame = CGRect(x: Double(xPos +
+                0), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
+                }
+                xPos = contentView.frame.origin.x  + contentView.frame.width + 0
+               //xPos scrollView.contentSize = CGSize(width:x+padding, height:scrollView.frame.size.height)
+                scrollView?.contentSize = CGSize(width: Double(xPos+10), height:Double(self.requiredHeight!))
+                scrollView?.layoutIfNeeded()
+                print("indexxx at: %d >>>> frame at:%@",contentView.frame.origin.x)
             }
         }
                 
-        newTransForm(index: index+1, viewCell: contentView,scrollOffsetX: scrollView!.contentOffset)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.didTap(tapGesture:)))
+        contentView.addGestureRecognizer(tap)
+        contentView.isUserInteractionEnabled = true
+        newTransForm(index: index, viewCell: contentView,scrollOffsetX: scrollView!.contentOffset)
         //transFromView(view:contentView,Index:index)
      //   newerTransfor(index: index, View: contentView)
         contentView=(datasource?.viewForIndexPathAtFullView(component: self, atView: contentView, index: index))!
@@ -215,8 +244,7 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         let radius:CGFloat  = max(0.01, CGFloat(Double(self.requiredWidth!) * Double(spacing) / 2.0) / tan(arc/2.0/count))
         var angle:CGFloat  = atOffset  / count * arc
 
-        
-        print(angle)
+               // print(angle)
        
         if (isVertical!)
        {
@@ -280,9 +308,9 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         }
     
     private func setupContent(){
-        maxCoverDegree = 45
-        coverDensity = 0.06
-        minCoverScale = 1.0
+        maxCoverDegree = 0
+        coverDensity = 0.25
+        minCoverScale = 0.69
         minCoverOpacity = 1
         
         separationAngle=0
@@ -292,11 +320,12 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         viewpointOffset = CGSize.zero
         _scrollOffset = 0
         scrollView = UIScrollView()
-        scrollView?.frame = CGRect.init(x: hostview!.frame.origin.x, y:  hostview!.frame.origin.y, width:  hostview!.frame.size.width, height: hostview!.frame.size.height)
+        scrollView?.frame = CGRect.init(x: hostview!.frame.origin.x, y:  hostview!.frame.origin.y, width:  hostview!.frame.size.width, height:  hostview!.frame.size.height)
         scrollView?.delegate=self
         scrollView?.backgroundColor = UIColor.cyan
         scrollView?.isScrollEnabled=true
-        scrollView?.isPagingEnabled=true
+        scrollView?.clipsToBounds = false
+    //    scrollView?.isPagingEnabled=true
         scrollView?.bounces=false
         self.addSubview(scrollView!)
         
@@ -318,29 +347,58 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
     }
     
     
+//    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+//
+//        let pageWidht:CGFloat = CGFloat(self.requiredWidth! + 10.0)
+//        let currentOffset = scrollView.contentOffset.x
+//        let targetOffset = CGFloat(targetContentOffset.pointee.x)
+//        var newTargetOffset:CGFloat = 0.0
+//
+//        if targetOffset > currentOffset {
+//            newTargetOffset = CGFloat(ceilf(Float((currentOffset / pageWidht) * pageWidht)))
+//        }
+//        else {
+//            newTargetOffset = CGFloat(floorf(Float((currentOffset / pageWidht) * pageWidht)))
+//        }
+//
+//        if newTargetOffset < 0.0 {
+//            newTargetOffset = 0.0
+//        }
+//        else if newTargetOffset > scrollView.contentSize.width {
+//            newTargetOffset = scrollView.contentSize.width
+//        }
+//        targetContentOffset.pointee = CGPoint(x: newTargetOffset, y: 0.0)
+//      //  scrollView.setContentOffset(CGPoint(x: CGFloat(newTargetOffset), y: 0), animated: true)
+//
+//    }
+
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
           
         delegator?.scrolldidScroll(scroll: scrollView)
-      /* let currentPage:Int = Int(scrollView.contentOffset.x / scrollView.frame.size.width)
-              print(currentPage)
-         // let currentPage:Int = Int(scrollView.contentOffset.x / scrollView.frame.size.width)
-                 var getView:UIView  = scrollView.viewWithTag(currentPage + 555)!
-                  getView.backgroundColor = UIColor.purple
-                 newTransForm(index: currentPage, viewCell: getView,scrollOffsetX: scrollView.contentOffset)
-*/
-
-    }
+        let currentPage:Int = Int(scrollView.contentOffset.x / CGFloat(self.requiredWidth!))
+    print("><<<<<<<<<<< %d",currentPage)
+        let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
+        //getView.backgroundColor = UIColor.purple
+        
+        let views = scrollView.subviews
+        for view in views{
+            if scrollView.bounds.intersects(view.frame) {
+                if view.tag>500{
+                    
+                        self.newTransForm(index: view.tag - 555, viewCell: view,scrollOffsetX: scrollView.contentOffset)
+                }
+            }
+        }
+     }
     
    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-     let currentPage:Int = Int(scrollView.contentOffset.x / scrollView.frame.size.width)
-    delegator?.carouselGetCurrentIndex(scroll: scrollView, currentIndex: currentPage)
-//       if currentPage == 0 {
-//        self.scrollView!.contentOffset = CGPoint(x: scrollView.frame.size.width * CGFloat(self.numberOfViews!), y: scrollView.contentOffset.y)
-//       }
-//       else if currentPage == numberOfViews {
-//        self.scrollView!.contentOffset = CGPoint(x: 0, y: scrollView.contentOffset.y)
-//       }
+let currentPage:Int = Int(scrollView.contentOffset.x / CGFloat(self.requiredWidth!))
+     // print("><<<<<<<<<<< %d",currentPage)
+let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
+//getView.backgroundColor = UIColor.purple
+    let views = scrollView.subviews
+
    }
     
     
@@ -377,6 +435,19 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         
         
     }
+    
+    
+    @objc func didTap(tapGesture:UITapGestureRecognizer)
+    {
+        //check for tapped view
+      let view = tapGesture.view
+      let loc = tapGesture.location(in: view)
+      let subview = view?.hitTest(loc, with: nil)
+        if subview != nil{
+                delegator?.carouselDidSelectItemAtIndex(scrollview: self.scrollView!, Index: subview!.tag -     555)
+        }
+    }
+
     
     func popAnimationState()
     {
@@ -490,15 +561,18 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         let center = itemCenterForRow(row - 1).x
         let prevItemRightEdge = CGFloat(center) + CGFloat(halfWidth)
         let projectedLeftEdgeLocal = CGFloat(CGFloat(halfWidth) * cos(maxRads) * kDistanceToProjectionPlane) / CGFloat(kDistanceToProjectionPlane + CGFloat(halfWidth) * sin(maxRads))
-
         return prevItemRightEdge - CGFloat(self.coverDensity) *  CGFloat(self.requiredWidth!) + CGFloat(projectedLeftEdgeLocal)
     }
     
     
     func itemCenterForRow(_ row:Int)->CGPoint {
          let collectionViewSize = scrollView?.bounds.size ?? CGSize.zero
-         return CGPoint(x: CGFloat(row) * collectionViewSize.width + collectionViewSize.width / 2,
-                        y: collectionViewSize.height/2)
+        print(collectionViewSize)
+        var final:CGPoint = CGPoint(x: CGFloat(row) * collectionViewSize.width + collectionViewSize.width / 2,
+            y: collectionViewSize.height/2)
+        //print(collectionViewSize)
+
+            return final
      }
      
       func degreesToRad(_ degrees:CGFloat)->CGFloat {
@@ -513,19 +587,24 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         let nextItemLeftEdge = CGFloat(center) - CGFloat(halfWidth)
         let projectedRightEdgeLocal = abs(CGFloat(halfWidth) * CGFloat(cos(maxRads)) * kDistanceToProjectionPlane / (CGFloat(-halfWidth) * CGFloat(sin(maxRads)) - kDistanceToProjectionPlane))
 
-        return nextItemLeftEdge + (CGFloat(self.coverDensity) * CGFloat(self.requiredWidth!)) - projectedRightEdgeLocal
+        return  nextItemLeftEdge + (CGFloat(self.coverDensity) * CGFloat(self.requiredWidth!)) - projectedRightEdgeLocal
     }
     
     
     //////New Real
     func newTransForm(index:Int,viewCell:UIView,scrollOffsetX:CGPoint){
     /// let attributesPath = attributes.indexPath
-            
-        let minInterval = CGFloat(index - 1) * CGFloat(self.requiredWidth!)
+        
+        if(index==0){
+        print(">>>>>>>Row",index)
+        print(">>>>>>>Offset",scrollOffsetX)
+        }
+            let minInterval = CGFloat(index - 1) * CGFloat(self.requiredWidth!)
             let maxInterval = CGFloat(index + 1) * CGFloat(self.requiredWidth!)
             let minX = minXCenterForRow(index)
             let maxX = maxXCenterForRow(index)
             let spanX = maxX - minX
+        print(">>>>>>>minX",minX)
 
        // let scrollview  = scrollView!.contentOffset
             // Interpolate by formula
@@ -538,12 +617,12 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         
         let interpolatedX = min(vale, maxX)
 
-                viewCell.center = CGPoint(x: viewCell.center.x, y: viewCell.center.y)
+            viewCell.center = CGPoint(x: viewCell.center.x, y: viewCell.center.y)
 
             var transform = CATransform3DIdentity
 
             // Add perspective ////change direction of scroll put negative perpective
-            transform.m34 = 1.0 / 500
+            transform.m34 = kDistanceToProjectionPlane
 
             // Then rotate.
         let angle = CGFloat(-self.maxCoverDegree) + (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * CGFloat(self.maxCoverDegree) / CGFloat(spanX)
@@ -551,24 +630,27 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
 
             // Then scale: 1 - abs(1 - Q - 2 * x * (1 - Q))
         //let scale = 1.0 - abs(1 - self.minCoverScale - (interpolatedX - minX) * 2 * (1.0 - self.minCoverScale) / spanX)
-        let scale = 1.0// - CGFloat(abs(1 - CGFloat(self.minCoverScale)) - (CGFloat(interpolatedX) - CGFloat(minX))) * 2 * (1.0 - CGFloat((self.minCoverScale)) / CGFloat(spanX))
-        transform = CATransform3DScale(transform, CGFloat(scale), CGFloat(scale), CGFloat(scale))
+        //let scale = 1.0// - CGFloat(abs(1 - CGFloat(self.minCoverScale)) - (CGFloat(interpolatedX) - CGFloat(minX))) * 2 * (1.0 - CGFloat((self.minCoverScale)) / CGFloat(spanX))
+        let scale = 1.0 - abs(1 - CGFloat(self.minCoverScale) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1.0 - CGFloat(self.minCoverScale)) / CGFloat(spanX))
+        print(">>>>>>>scale",scale)
+
+        transform = CATransform3DScale(transform, 1, CGFloat(scale), CGFloat(scale))
 
             // Apply transform
-            viewCell.transform3D = transform
-
+             viewCell.transform3D = transform
+      
             // Add opacity: 1 - abs(1 - Q - 2 * x * (1 - Q))
             let opacity = 1.0 - abs(1 - CGFloat(self.minCoverOpacity) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1 - CGFloat(self.minCoverOpacity)) / CGFloat(spanX))
 
-       // viewCell.alpha = CGFloat(opacity)
-            print(angle)
+        viewCell.alpha = CGFloat(opacity)
+        print(">>>>>>>Angle",angle)
 
-        print(String(format:"IDX: %d. MinX: %.2f. MaxX: %.2f. Interpolated: %.2f. Interpolated angle: %.2f ..AScale : %.2f",
-                   index,
-                   minX,
-                   maxX,
-                   interpolatedX,
-                   angle,scale));
+//        print(String(format:"IDX: %d. MinX: %.2f. MaxX: %.2f. Interpolated: %.2f. Interpolated angle: %.2f ..AScale : %.2f",
+//                   index,
+//                   minX,
+//                   maxX,
+//                   interpolatedX,
+//                   angle,scale));
 
 
            // return attributes

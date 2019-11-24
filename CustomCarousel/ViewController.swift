@@ -10,10 +10,17 @@ import UIKit
 
 class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingComponentDataSourceProtocol {
    
+    func carouselDidSelectItemAtIndex(scrollview: UIScrollView, Index: Int) {
+        
+               // print(Index)
+
+    }
+    
+   
     
     
     func carouselGetCurrentIndex(scroll: UIScrollView, currentIndex: Int) {
-        print(currentIndex)
+       // print(currentIndex)
     }
     
   
@@ -33,7 +40,7 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
         label.backgroundColor = UIColor.orange
         label.text = "I'm a test label"
         atView.addSubview(label)
-        
+       // atView.backgroundColor = .magenta
         return atView
         
     }
@@ -41,7 +48,7 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
     
     func requiredHeightandWidth(component: AmazingComponent) -> (Double, Double, Double, Double) {
             
-        return (Double( self.view.frame.size.width),500,0,200)
+        return (Double( 280),548.011,30,150)
     }
     
     func numberofViewsRequired(component: AmazingComponent) -> Int {
@@ -63,10 +70,10 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
       newView?.isUserInteractionEnabled=true
     newView?.carouselType=CarouselType.Cylinder.rawValue
       //newView?.requiredSpacing=500
+    newView?.carouselDirectionRight = true
       newView?.isVertical=false
       newView?.delegator=self
       newView?.datasource=self
-     
       self.view.addSubview(newView!)
       
   }

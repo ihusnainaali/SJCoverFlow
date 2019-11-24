@@ -60,8 +60,8 @@
 			children = (
 				0C13FA65236FF703004445FA /* AppDelegate.swift */,
 				0C13FA67236FF703004445FA /* SceneDelegate.swift */,
-				0C13FA69236FF703004445FA /* ViewController.swift */,
 				0C13FA79236FF70F004445FA /* AmazingComponent.swift */,
+				0C13FA69236FF703004445FA /* ViewController.swift */,
 				0C13FA6B236FF703004445FA /* Main.storyboard */,
 				0C13FA6E236FF706004445FA /* Assets.xcassets */,
 				0C13FA70236FF706004445FA /* LaunchScreen.storyboard */,
@@ -291,7 +291,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = EMA66R8VA4;
 				INFOPLIST_FILE = CustomCarousel/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -310,7 +310,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = EMA66R8VA4;
 				INFOPLIST_FILE = CustomCarousel/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
