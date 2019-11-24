@@ -60,14 +60,22 @@
 			children = (
 				0C13FA65236FF703004445FA /* AppDelegate.swift */,
 				0C13FA67236FF703004445FA /* SceneDelegate.swift */,
-				0C13FA79236FF70F004445FA /* SJCarousel.swift */,
 				0C13FA69236FF703004445FA /* ViewController.swift */,
+				0CC4C82B238A7FE300BD2E50 /* SJCarousel */,
 				0C13FA6B236FF703004445FA /* Main.storyboard */,
 				0C13FA6E236FF706004445FA /* Assets.xcassets */,
 				0C13FA70236FF706004445FA /* LaunchScreen.storyboard */,
 				0C13FA73236FF706004445FA /* Info.plist */,
 			);
 			path = CustomCarousel;
+			sourceTree = "<group>";
+		};
+		0CC4C82B238A7FE300BD2E50 /* SJCarousel */ = {
+			isa = PBXGroup;
+			children = (
+				0C13FA79236FF70F004445FA /* SJCarousel.swift */,
+			);
+			path = SJCarousel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
