@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingComponentDataSourceProtocol {
+class ViewController: UIViewController,SJCarouselDelgateProtocol,SJCarouselDataSourceProtocol {
    
     func carouselDidSelectItemAtIndex(scrollview: UIScrollView, Index: Int) {
         
@@ -32,7 +32,7 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
    
     
     
-    func viewForIndexPathAtFullView(component: AmazingComponent, atView: UIView, index: Int) -> UIView {
+    func viewForIndexPathAtFullView(component: SJCarousel, atView: UIView, index: Int) -> UIView {
         
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 21))
         label.center = CGPoint(x: 50, y: 50)
@@ -46,31 +46,31 @@ class ViewController: UIViewController,AmazingComponentDelgateProtocol,AmazingCo
     }
 
     
-    func requiredHeightandWidth(component: AmazingComponent) -> (Double, Double, Double, Double) {
+    func requiredHeightandWidth(component: SJCarousel) -> (Double, Double, Double, Double) {
             
         return (Double( 280),548.011,30,150)
     }
     
-    func numberofViewsRequired(component: AmazingComponent) -> Int {
+    func numberofViewsRequired(component: SJCarousel) -> Int {
                 return 10
     }
     
  
   
   
-  var newView:AmazingComponent?
+  var newView:SJCarousel?
   override func viewDidLoad() {
       super.viewDidLoad()
     
     self.view.backgroundColor = UIColor.orange
       // Do any additional setup after loading the view.
-      newView = AmazingComponent()
+      newView = SJCarousel()
       newView?.frame=CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
       newView?.initWithView(view: self.view)
       newView?.isUserInteractionEnabled=true
-    newView?.carouselType=CarouselType.Cylinder.rawValue
+      newView?.carouselType=CarouselType.Cylinder.rawValue
       //newView?.requiredSpacing=500
-    newView?.carouselDirectionRight = true
+     newView?.carouselDirectionRight = true
       newView?.isVertical=false
       newView?.delegator=self
       newView?.datasource=self

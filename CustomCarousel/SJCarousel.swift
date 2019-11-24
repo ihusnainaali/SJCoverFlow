@@ -1,5 +1,5 @@
 //
-//  AmazingComponent.swift
+//  SJCarousel.swift
 //  CustomControl
 //
 //  Created by Sameer Junaid on 11/3/19.
@@ -15,7 +15,7 @@ public enum CarouselType: Int {
     case Coverflow = 2
 }
 
-protocol AmazingComponentDelgateProtocol:class {
+protocol SJCarouselDelgateProtocol:class {
     
     func scrolldidScroll(scroll:UIScrollView)
     func carouselGetCurrentIndex(scroll:UIScrollView,currentIndex:Int)
@@ -23,26 +23,25 @@ protocol AmazingComponentDelgateProtocol:class {
     func carouselDidSelectItemAtIndex(scrollview:UIScrollView,Index:Int)
 }
 
-protocol AmazingComponentDataSourceProtocol:class {
+protocol SJCarouselDataSourceProtocol:class {
     
-    func numberofViewsRequired(component:AmazingComponent) -> Int
-    func requiredHeightandWidth(component:AmazingComponent) -> (Double,Double,Double,Double)
-    func viewForIndexPathAtFullView(component:AmazingComponent,atView:UIView,index:Int) -> UIView
+    func numberofViewsRequired(component:SJCarousel) -> Int
+    func requiredHeightandWidth(component:SJCarousel) -> (Double,Double,Double,Double)
+    func viewForIndexPathAtFullView(component:SJCarousel,atView:UIView,index:Int) -> UIView
 
 }
 
 
-class AmazingComponent: UIView,UIScrollViewDelegate {
+class SJCarousel: UIView,UIScrollViewDelegate {
     
     var FLOAT_ERROR_MARGIN:CGFloat = 0.000001
     var scrollView:UIScrollView?
-    weak var delegator:AmazingComponentDelgateProtocol?
+    weak var delegator:SJCarouselDelgateProtocol?
    private var numberOfViews:Int?
    private var requiredHeight:Double? = nil
    private var requiredWidth:Double? = nil
     private var requiredX:Double? = nil
     private var requiredY:Double? = nil
-
     public var isVertical:Bool? = true
     private var hostview:UIView?
     var _scrollOffset:CGFloat?
@@ -61,6 +60,7 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
     var ignorePerpendicularSwipes:Bool?
     var centerItemWhenSelected:Bool?
     var dragging:Bool?
+    var isGapDistanceEnabled:Bool = false
     var decelerating:Bool?
     var scrolling:Bool?
     var itemWidth:CGFloat?
@@ -74,6 +74,12 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
     var inclinationAngle:CGFloat?
     var backItemAlpha:CGFloat?
     var xPos : CGFloat = 0
+    var xAngle : CGFloat?
+    var yAngle : CGFloat?
+    var zAngle : CGFloat?
+
+    
+    
   fileprivate var kDistanceToProjectionPlane:CGFloat = 1/500.0
     open var carouselDirectionRight:Bool = false {
         
@@ -108,6 +114,8 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         }
     }
 
+    var gapDistance:CGFloat? = 0
+    
     /**
      *  Min opacity that can be applied to individual item.
      *  Default to 1.0 (alpha 100%).
@@ -135,7 +143,7 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
             }
         }
     }
-    weak var datasource:AmazingComponentDataSourceProtocol?{
+    weak var datasource:SJCarouselDataSourceProtocol?{
         
         
         didSet{
@@ -202,8 +210,6 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         contentView.addGestureRecognizer(tap)
         contentView.isUserInteractionEnabled = true
         newTransForm(index: index, viewCell: contentView,scrollOffsetX: scrollView!.contentOffset)
-        //transFromView(view:contentView,Index:index)
-     //   newerTransfor(index: index, View: contentView)
         contentView=(datasource?.viewForIndexPathAtFullView(component: self, atView: contentView, index: index))!
         scrollView?.addSubview(contentView)
 
@@ -308,11 +314,15 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         }
     
     private func setupContent(){
-        maxCoverDegree = 0
+        maxCoverDegree = 45
         coverDensity = 0.25
         minCoverScale = 0.69
         minCoverOpacity = 1
-        
+        gapDistance = 1
+        xAngle = -10
+        yAngle = 0
+        zAngle = -10
+        isGapDistanceEnabled=true
         separationAngle=0
         inclinationAngle = -0.1;
            backItemAlpha = 0.7;
@@ -346,31 +356,6 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-//    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-//
-//        let pageWidht:CGFloat = CGFloat(self.requiredWidth! + 10.0)
-//        let currentOffset = scrollView.contentOffset.x
-//        let targetOffset = CGFloat(targetContentOffset.pointee.x)
-//        var newTargetOffset:CGFloat = 0.0
-//
-//        if targetOffset > currentOffset {
-//            newTargetOffset = CGFloat(ceilf(Float((currentOffset / pageWidht) * pageWidht)))
-//        }
-//        else {
-//            newTargetOffset = CGFloat(floorf(Float((currentOffset / pageWidht) * pageWidht)))
-//        }
-//
-//        if newTargetOffset < 0.0 {
-//            newTargetOffset = 0.0
-//        }
-//        else if newTargetOffset > scrollView.contentSize.width {
-//            newTargetOffset = scrollView.contentSize.width
-//        }
-//        targetContentOffset.pointee = CGPoint(x: newTargetOffset, y: 0.0)
-//      //  scrollView.setContentOffset(CGPoint(x: CGFloat(newTargetOffset), y: 0), animated: true)
-//
-//    }
 
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -392,14 +377,10 @@ class AmazingComponent: UIView,UIScrollViewDelegate {
         }
      }
     
-   func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-let currentPage:Int = Int(scrollView.contentOffset.x / CGFloat(self.requiredWidth!))
-     // print("><<<<<<<<<<< %d",currentPage)
-let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
-//getView.backgroundColor = UIColor.purple
-    let views = scrollView.subviews
+        func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+           
 
-   }
+        }
     
     
 // # Mark: Animation
@@ -454,106 +435,7 @@ let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
         CATransaction.commit()
     }
     
-    func depthSortViews()
-    {
-        
-//        var viewArray = [UIView]()
-//        viewArray = [[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))compareViewDepth context:(__bridge void *)self]
-//        for (view in [[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))compareViewDepth context:(__bridge void *)self] as UIView)
-//        {
-//            contentView.bringSubviewToFront:(UIView *__nonnull)view.superview
-//        }
-    }
-  /*
-    @objc func step(){
-        
-        
-            pushAnimationState(enabled: false)
-            var currentTime:TimeInterval = CACurrentMediaTime();
-        var delta:Double = Double(currentTime) - Double(lastTime!)
-            lastTime = currentTime;
-            
-        if (scrolling! && !dragging!)
-            {
-                var time:TimeInterval = min(1.0, (currentTime - startTime!) / scrollDuration!);
-                delta = Double(easeInOut(time:CGFloat(time)))
-                _scrollOffset = startOffset + (endOffset - startOffset) * CGFloat(delta)
-                didScroll()
-                if (time >= 1.0)
-                {
-                    scrolling = false
-                    depthSortViews()
-                    pushAnimationState(enabled: true)
-                    delegator!.carouselDidEndScrollingAnimation(scroll:scrollView!)
-                    popAnimationState()
-                }
-            }
-            else if (decelerating!)
-            {
-                var time:CGFloat = min(CGFloat(scrollDuration!), CGFloat(currentTime) - CGFloat(startTime!));
-                var acceleration:CGFloat = CGFloat(-startVelocity)/CGFloat(scrollDuration!)
-                var distance:CGFloat = startVelocity * time + 0.5 * acceleration * pow(time, 2.0);
-                _scrollOffset = startOffset + distance;
-                didScroll()
-                if (abs(CGFloat(time) - CGFloat(scrollDuration!)) < CGFloat(FLOAT_ERROR_MARGIN))
-                {
-                    decelerating = false;
-                    pushAnimationState(enabled: true)
-                    delegator!.carouselDidEndScrollingAnimation(scroll:scrollView!)
-                    popAnimationState()
-                    if ((scrollToItemBoundary || fabs(_scrollOffset - [self clampedOffset:_scrollOffset]) > FLOAT_ERROR_MARGIN) && !autoscroll)
-                    {
-                        if (fabs(_scrollOffset - self.currentItemIndex) < FLOAT_ERROR_MARGIN)
-                        {
-                            //call scroll to trigger events for legacy support reasons
-                            //even though technically we don't need to scroll at all
-                            [self scrollToItemAtIndex:self.currentItemIndex duration:0.01];
-                        }
-                        else
-                        {
-                            [self scrollToItemAtIndex:self.currentItemIndex animated:YES];
-                        }
-                    }
-                    else
-                    {
-                        CGFloat difference = round(_scrollOffset) - _scrollOffset;
-                        if (difference > 0.5)
-                        {
-                            difference = difference - 1.0;
-                        }
-                        else if (difference < -0.5)
-                        {
-                            difference = 1.0 + difference;
-                        }
-                        _toggleTime = currentTime - MAX_TOGGLE_DURATION * fabs(difference);
-                        _toggle = MAX(-1.0, MIN(1.0, -difference));
-                    }
-                }
-            }
-            else if (_autoscroll && !_dragging)
-            {
-                //autoscroll goes backwards from what you'd expect, for historical reasons
-                self.scrollOffset = [self clampedOffset:_scrollOffset - delta * _autoscroll];
-            }
-            else if (fabs(_toggle) > FLOAT_ERROR_MARGIN)
-            {
-                NSTimeInterval toggleDuration = _startVelocity? MIN(1.0, MAX(0.0, 1.0 / fabs(_startVelocity))): 1.0;
-                toggleDuration = MIN_TOGGLE_DURATION + (MAX_TOGGLE_DURATION - MIN_TOGGLE_DURATION) * toggleDuration;
-                NSTimeInterval time = MIN(1.0, (currentTime - _toggleTime) / toggleDuration);
-                delta = [self easeInOut:time];
-                _toggle = (_toggle < 0.0)? (delta - 1.0): (1.0 - delta);
-                didScroll()
-            }
-            else if (!_autoscroll)
-            {
-                stopAnimation();
-            }
-            
-            popAnimationState()
-        
-    }
-    
-    */
+
     func minXCenterForRow(_ row:Int)->CGFloat {
         let halfWidth = self.requiredWidth!/2
         let maxRads = degreesToRad(self.maxCoverDegree)
@@ -606,10 +488,7 @@ let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
             let spanX = maxX - minX
         print(">>>>>>>minX",minX)
 
-       // let scrollview  = scrollView!.contentOffset
-            // Interpolate by formula
-           // let interpolatedX =  max((CGFloat(minX) + (CGFloat(spanX))) / ((CGFloat(maxInterval) - CGFloat(minInterval)) * (CGFloat(5) - CGFloat(minInterval)),CGFloat(minX)),minX)
-        
+    
         
         
         let finalvalue = CGFloat(minX) + ((CGFloat(spanX) / (CGFloat(maxInterval) - CGFloat(minInterval))) * (CGFloat(scrollOffsetX.x) - CGFloat(minInterval)))
@@ -626,16 +505,23 @@ let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
 
             // Then rotate.
         let angle = CGFloat(-self.maxCoverDegree) + (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * CGFloat(self.maxCoverDegree) / CGFloat(spanX)
-            transform = CATransform3DRotate(transform, degreesToRad(CGFloat(angle)), 0, 1, 0)
+            transform = CATransform3DRotate(transform, degreesToRad(CGFloat(angle)), xAngle!, yAngle!, zAngle!)
 
             // Then scale: 1 - abs(1 - Q - 2 * x * (1 - Q))
         //let scale = 1.0 - abs(1 - self.minCoverScale - (interpolatedX - minX) * 2 * (1.0 - self.minCoverScale) / spanX)
         //let scale = 1.0// - CGFloat(abs(1 - CGFloat(self.minCoverScale)) - (CGFloat(interpolatedX) - CGFloat(minX))) * 2 * (1.0 - CGFloat((self.minCoverScale)) / CGFloat(spanX))
-        let scale = 1.0 - abs(1 - CGFloat(self.minCoverScale) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1.0 - CGFloat(self.minCoverScale)) / CGFloat(spanX))
+        var scale = 1.0 - abs(1 - CGFloat(self.minCoverScale) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1.0 - CGFloat(self.minCoverScale)) / CGFloat(spanX))
         print(">>>>>>>scale",scale)
 
-        transform = CATransform3DScale(transform, 1, CGFloat(scale), CGFloat(scale))
+        if(isGapDistanceEnabled == true){
+            gapDistance = scale
+        }
+            
+        print(">>>>>>>gapDistance",gapDistance)
 
+      //
+    transform = CATransform3DScale(transform, CGFloat(gapDistance!), CGFloat(scale), CGFloat(scale))
+        
             // Apply transform
              viewCell.transform3D = transform
       
@@ -658,30 +544,6 @@ let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
     }
 
   
-    func newerTransfor(
-        index:Int,View:UIView) {
-        var transform:CATransform3D = CATransform3DIdentity;
-        transform.m34 = 1.0 / 500.0;
-        let itemView:UIView = View
-        radius = CGFloat((self.requiredWidth!/2 )) /  tan((CGFloat(Double.pi) / CGFloat(index)))
-        separationAngle = (CGFloat(Double.pi)*2) / CGFloat(index)
-        var angle:CGFloat = separationAngle!
-        itemView.layer.anchorPointZ = -radius!
-        //itemView.layer.transform = CATransform3DMakeRotation(0,separationAngle!, 0, 0);
-        itemView.layer.transform = CATransform3DConcat(transform, CATransform3DMakeRotation(0, radius!, -radius!, 0));
-               
-//               if (angle > CGFloat(Double.pi)/2 && angle < (1.5 * CGFloat(Double.pi))) {
-//                   itemView.alpha = backItemAlpha!
-//               } else {
-//                   itemView.alpha = 1;
-//               }
-               
-               
-       // angle += separationAngle!;
-        
-           
-          
-    }
 
  
 }
