@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  CustomCarousel
 //
-//  Created by Sameer Junaid on 11/4/19.
+//  Created by Sameer JD on 11/4/19.
 //  Copyright © 2019 CodiftaLabs. All rights reserved.
 //
 
