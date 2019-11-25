@@ -13,7 +13,7 @@
 		0C13FA6D236FF703004445FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C13FA6B236FF703004445FA /* Main.storyboard */; };
 		0C13FA6F236FF706004445FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C13FA6E236FF706004445FA /* Assets.xcassets */; };
 		0C13FA72236FF706004445FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C13FA70236FF706004445FA /* LaunchScreen.storyboard */; };
-		0C13FA7A236FF70F004445FA /* AmazingComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13FA79236FF70F004445FA /* AmazingComponent.swift */; };
+		0CC4C82C238A92CE00BD2E50 /* SJCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13FA79236FF70F004445FA /* SJCarousel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +25,7 @@
 		0C13FA6E236FF706004445FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C13FA71236FF706004445FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C13FA73236FF706004445FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0C13FA79236FF70F004445FA /* AmazingComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmazingComponent.swift; sourceTree = "<group>"; };
+		0C13FA79236FF70F004445FA /* SJCarousel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SJCarousel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,13 +61,21 @@
 				0C13FA65236FF703004445FA /* AppDelegate.swift */,
 				0C13FA67236FF703004445FA /* SceneDelegate.swift */,
 				0C13FA69236FF703004445FA /* ViewController.swift */,
-				0C13FA79236FF70F004445FA /* AmazingComponent.swift */,
+				0CC4C82B238A7FE300BD2E50 /* SJCarousel */,
 				0C13FA6B236FF703004445FA /* Main.storyboard */,
 				0C13FA6E236FF706004445FA /* Assets.xcassets */,
 				0C13FA70236FF706004445FA /* LaunchScreen.storyboard */,
 				0C13FA73236FF706004445FA /* Info.plist */,
 			);
 			path = CustomCarousel;
+			sourceTree = "<group>";
+		};
+		0CC4C82B238A7FE300BD2E50 /* SJCarousel */ = {
+			isa = PBXGroup;
+			children = (
+				0C13FA79236FF70F004445FA /* SJCarousel.swift */,
+			);
+			path = SJCarousel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,10 +149,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CC4C82C238A92CE00BD2E50 /* SJCarousel.swift in Sources */,
 				0C13FA6A236FF703004445FA /* ViewController.swift in Sources */,
 				0C13FA66236FF703004445FA /* AppDelegate.swift in Sources */,
 				0C13FA68236FF703004445FA /* SceneDelegate.swift in Sources */,
-				0C13FA7A236FF70F004445FA /* AmazingComponent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,6 +299,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = EMA66R8VA4;
 				INFOPLIST_FILE = CustomCarousel/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -309,6 +318,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = EMA66R8VA4;
 				INFOPLIST_FILE = CustomCarousel/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
