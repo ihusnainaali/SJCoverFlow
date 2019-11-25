@@ -13,7 +13,7 @@
 		0C13FA6D236FF703004445FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C13FA6B236FF703004445FA /* Main.storyboard */; };
 		0C13FA6F236FF706004445FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C13FA6E236FF706004445FA /* Assets.xcassets */; };
 		0C13FA72236FF706004445FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C13FA70236FF706004445FA /* LaunchScreen.storyboard */; };
-		0C13FA7A236FF70F004445FA /* SJCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13FA79236FF70F004445FA /* SJCarousel.swift */; };
+		0CC4C82C238A92CE00BD2E50 /* SJCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13FA79236FF70F004445FA /* SJCarousel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -149,10 +149,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CC4C82C238A92CE00BD2E50 /* SJCarousel.swift in Sources */,
 				0C13FA6A236FF703004445FA /* ViewController.swift in Sources */,
 				0C13FA66236FF703004445FA /* AppDelegate.swift in Sources */,
 				0C13FA68236FF703004445FA /* SceneDelegate.swift in Sources */,
-				0C13FA7A236FF70F004445FA /* SJCarousel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

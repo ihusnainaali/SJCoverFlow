@@ -35,6 +35,9 @@ protocol SJCarouselDataSourceProtocol:class {
 class SJCarousel: UIView,UIScrollViewDelegate {
     
     var FLOAT_ERROR_MARGIN:CGFloat = 0.000001
+     var VIEW_TAG:Int = 555
+
+    
     var scrollView:UIScrollView?
     weak var delegator:SJCarouselDelgateProtocol?
    private var numberOfViews:Int?
@@ -77,6 +80,7 @@ class SJCarousel: UIView,UIScrollViewDelegate {
     var xAngle : CGFloat?
     var yAngle : CGFloat?
     var zAngle : CGFloat?
+    var backgroundImage : UIImageView?
 
     
     
@@ -170,15 +174,7 @@ class SJCarousel: UIView,UIScrollViewDelegate {
     private func loadViewWithndex(index:Int){
         
         var contentView:UIView = UIView()
-            contentView.tag = index + 555
-            if (index%2==0){
-                contentView.backgroundColor = UIColor.blue
-              }else{
-                  contentView.backgroundColor = UIColor.green
-              }
-        
-        
-         
+            contentView.tag = index + VIEW_TAG
          if isVertical == true{
             scrollView?.contentSize = CGSize(width:Double(self.requiredWidth!), height: Double(index) * Double(self.requiredHeight!))
             if requiredSpacing != nil {
@@ -190,19 +186,16 @@ class SJCarousel: UIView,UIScrollViewDelegate {
             if requiredSpacing != nil {
                 contentView.frame = CGRect(x: Double(index) * Double(requiredSpacing!), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
             }else{
-                
                 if (index==0){
                     contentView.frame = CGRect(x:Double(xPos +
-                       80), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
+                       CGFloat(self.requiredWidth!)/3), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
               }else{
                 contentView.frame = CGRect(x: Double(xPos +
                 0), y:Double(self.requiredY!) , width:Double(self.requiredWidth!), height: Double(self.requiredHeight!))
                 }
-                xPos = contentView.frame.origin.x  + contentView.frame.width + 0
-               //xPos scrollView.contentSize = CGSize(width:x+padding, height:scrollView.frame.size.height)
-                scrollView?.contentSize = CGSize(width: Double(xPos+10), height:Double(self.requiredHeight!))
+                xPos = contentView.frame.origin.x  + contentView.frame.width
+                scrollView?.contentSize = CGSize(width: Double(xPos+10) + (self.requiredWidth!/3), height:Double(self.requiredHeight!))
                 scrollView?.layoutIfNeeded()
-                print("indexxx at: %d >>>> frame at:%@",contentView.frame.origin.x)
             }
         }
                 
@@ -248,7 +241,7 @@ class SJCarousel: UIView,UIScrollViewDelegate {
         let spacing:CGFloat  = 1.0
         let arc:CGFloat  = CGFloat(Double.pi * 2.0);
         let radius:CGFloat  = max(0.01, CGFloat(Double(self.requiredWidth!) * Double(spacing) / 2.0) / tan(arc/2.0/count))
-        var angle:CGFloat  = atOffset  / count * arc
+        let angle:CGFloat  = atOffset  / count * arc
 
                // print(angle)
        
@@ -319,9 +312,9 @@ class SJCarousel: UIView,UIScrollViewDelegate {
         minCoverScale = 0.69
         minCoverOpacity = 1
         gapDistance = 1
-        xAngle = -10
-        yAngle = 0
-        zAngle = -10
+        xAngle = 0
+        yAngle = 1
+        zAngle = 0
         isGapDistanceEnabled=true
         separationAngle=0
         inclinationAngle = -0.1;
@@ -329,10 +322,15 @@ class SJCarousel: UIView,UIScrollViewDelegate {
         _perspective = -1.0/500.0;
         viewpointOffset = CGSize.zero
         _scrollOffset = 0
+        
+        backgroundImage = UIImageView()
+        backgroundImage!.frame = CGRect.init(x: hostview!.frame.origin.x, y:  hostview!.frame.origin.y, width:  hostview!.frame.size.width, height:  hostview!.frame.size.height)
+        self.addSubview(backgroundImage!)
+
         scrollView = UIScrollView()
         scrollView?.frame = CGRect.init(x: hostview!.frame.origin.x, y:  hostview!.frame.origin.y, width:  hostview!.frame.size.width, height:  hostview!.frame.size.height)
         scrollView?.delegate=self
-        scrollView?.backgroundColor = UIColor.cyan
+        scrollView?.backgroundColor = UIColor.clear
         scrollView?.isScrollEnabled=true
         scrollView?.clipsToBounds = false
     //    scrollView?.isPagingEnabled=true
@@ -362,16 +360,13 @@ class SJCarousel: UIView,UIScrollViewDelegate {
           
         delegator?.scrolldidScroll(scroll: scrollView)
         let currentPage:Int = Int(scrollView.contentOffset.x / CGFloat(self.requiredWidth!))
-    print("><<<<<<<<<<< %d",currentPage)
-        let getView:UIView  = scrollView.viewWithTag((currentPage) + 555) ?? scrollView
-        //getView.backgroundColor = UIColor.purple
-        
+        let getView:UIView  = scrollView.viewWithTag((currentPage) + VIEW_TAG) ?? scrollView
         let views = scrollView.subviews
         for view in views{
             if scrollView.bounds.intersects(view.frame) {
-                if view.tag>500{
+                if view.tag>VIEW_TAG{
                     
-                        self.newTransForm(index: view.tag - 555, viewCell: view,scrollOffsetX: scrollView.contentOffset)
+                        self.newTransForm(index: view.tag - VIEW_TAG, viewCell: view,scrollOffsetX: scrollView.contentOffset)
                 }
             }
         }
@@ -425,7 +420,7 @@ class SJCarousel: UIView,UIScrollViewDelegate {
       let loc = tapGesture.location(in: view)
       let subview = view?.hitTest(loc, with: nil)
         if subview != nil{
-                delegator?.carouselDidSelectItemAtIndex(scrollview: self.scrollView!, Index: subview!.tag -     555)
+                delegator?.carouselDidSelectItemAtIndex(scrollview: self.scrollView!, Index: subview!.tag -     VIEW_TAG)
         }
     }
 
@@ -475,21 +470,12 @@ class SJCarousel: UIView,UIScrollViewDelegate {
     
     //////New Real
     func newTransForm(index:Int,viewCell:UIView,scrollOffsetX:CGPoint){
-    /// let attributesPath = attributes.indexPath
-        
-        if(index==0){
-        print(">>>>>>>Row",index)
-        print(">>>>>>>Offset",scrollOffsetX)
-        }
-            let minInterval = CGFloat(index - 1) * CGFloat(self.requiredWidth!)
-            let maxInterval = CGFloat(index + 1) * CGFloat(self.requiredWidth!)
-            let minX = minXCenterForRow(index)
-            let maxX = maxXCenterForRow(index)
-            let spanX = maxX - minX
-        print(">>>>>>>minX",minX)
-
     
-        
+        let minInterval = CGFloat(index - 1) * CGFloat(self.requiredWidth!)
+        let maxInterval = CGFloat(index + 1) * CGFloat(self.requiredWidth!)
+        let minX = minXCenterForRow(index)
+        let maxX = maxXCenterForRow(index)
+        let spanX = maxX - minX
         
         let finalvalue = CGFloat(minX) + ((CGFloat(spanX) / (CGFloat(maxInterval) - CGFloat(minInterval))) * (CGFloat(scrollOffsetX.x) - CGFloat(minInterval)))
         let vale = max(finalvalue, minX)
@@ -506,40 +492,20 @@ class SJCarousel: UIView,UIScrollViewDelegate {
             // Then rotate.
         let angle = CGFloat(-self.maxCoverDegree) + (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * CGFloat(self.maxCoverDegree) / CGFloat(spanX)
             transform = CATransform3DRotate(transform, degreesToRad(CGFloat(angle)), xAngle!, yAngle!, zAngle!)
-
-            // Then scale: 1 - abs(1 - Q - 2 * x * (1 - Q))
-        //let scale = 1.0 - abs(1 - self.minCoverScale - (interpolatedX - minX) * 2 * (1.0 - self.minCoverScale) / spanX)
-        //let scale = 1.0// - CGFloat(abs(1 - CGFloat(self.minCoverScale)) - (CGFloat(interpolatedX) - CGFloat(minX))) * 2 * (1.0 - CGFloat((self.minCoverScale)) / CGFloat(spanX))
+        
         var scale = 1.0 - abs(1 - CGFloat(self.minCoverScale) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1.0 - CGFloat(self.minCoverScale)) / CGFloat(spanX))
-        print(">>>>>>>scale",scale)
 
         if(isGapDistanceEnabled == true){
             gapDistance = scale
         }
-            
-        print(">>>>>>>gapDistance",gapDistance)
-
-      //
-    transform = CATransform3DScale(transform, CGFloat(gapDistance!), CGFloat(scale), CGFloat(scale))
+        
+        transform = CATransform3DScale(transform, 1, CGFloat(scale), CGFloat(scale))
         
             // Apply transform
-             viewCell.transform3D = transform
-      
-            // Add opacity: 1 - abs(1 - Q - 2 * x * (1 - Q))
-            let opacity = 1.0 - abs(1 - CGFloat(self.minCoverOpacity) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1 - CGFloat(self.minCoverOpacity)) / CGFloat(spanX))
+        viewCell.transform3D = transform
+        let opacity = 1.0 - abs(1 - CGFloat(self.minCoverOpacity) - (CGFloat(interpolatedX) - CGFloat(minX)) * 2 * (1 - CGFloat(self.minCoverOpacity)) / CGFloat(spanX))
 
         viewCell.alpha = CGFloat(opacity)
-        print(">>>>>>>Angle",angle)
-
-//        print(String(format:"IDX: %d. MinX: %.2f. MaxX: %.2f. Interpolated: %.2f. Interpolated angle: %.2f ..AScale : %.2f",
-//                   index,
-//                   minX,
-//                   maxX,
-//                   interpolatedX,
-//                   angle,scale));
-
-
-           // return attributes
     
     }
 

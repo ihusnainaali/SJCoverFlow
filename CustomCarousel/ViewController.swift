@@ -34,13 +34,21 @@ class ViewController: UIViewController,SJCarouselDelgateProtocol,SJCarouselDataS
     
     func viewForIndexPathAtFullView(component: SJCarousel, atView: UIView, index: Int) -> UIView {
         
-        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 21))
-        label.center = CGPoint(x: 50, y: 50)
+        let backgroundImage = UIImageView()
+        backgroundImage.frame = CGRect.init(x: 0, y:  0, width:240, height:380)
+        backgroundImage.image = UIImage(named:"page")
+        backgroundImage.clipsToBounds = true
+        backgroundImage.contentMode = .scaleAspectFill
+        atView.addSubview(backgroundImage)
+
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: 21))
         label.textAlignment = .center
         label.backgroundColor = UIColor.orange
         label.text = "I'm a test label"
-        atView.addSubview(label)
-       // atView.backgroundColor = .magenta
+       // atView.addSubview(label)
+        //atView.backgroundColor = .magenta
+        
+        
         return atView
         
     }
@@ -48,7 +56,7 @@ class ViewController: UIViewController,SJCarouselDelgateProtocol,SJCarouselDataS
     
     func requiredHeightandWidth(component: SJCarousel) -> (Double, Double, Double, Double) {
             
-        return (Double( 280),548.011,30,150)
+        return (Double( 240),380,30,180)
     }
     
     func numberofViewsRequired(component: SJCarousel) -> Int {
@@ -70,17 +78,19 @@ class ViewController: UIViewController,SJCarouselDelgateProtocol,SJCarouselDataS
       newView?.isUserInteractionEnabled=true
       newView?.carouselType=CarouselType.Cylinder.rawValue
       //newView?.requiredSpacing=500
-     newView?.carouselDirectionRight = true
+      newView?.carouselDirectionRight = true
       newView?.isVertical=false
       newView?.delegator=self
       newView?.datasource=self
+      newView?.backgroundImage!.image = UIImage(named:"background")
+
       self.view.addSubview(newView!)
       
   }
 
     
     func scrolldidScroll(scroll: UIScrollView) {
-       // print(scroll.contentOffset)
+      //  print(scroll.contentOffset)
     }
     
     
